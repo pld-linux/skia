@@ -12,12 +12,16 @@ Release:	0.%{rel}.%{subver}
 License:	BSD
 Group:		Development/Libraries
 Source0:	%{name}-%{subver}.tar.xz
-# Source0-md5:	d3338ba25a4130d8a5e0678cb416cf02
+# Source0-md5:	e2de2d4871a315cd1e252f77cd96dca2
 Source1:	get-source.sh
 Source2:	gclient.conf
 URL:		https://sites.google.com/site/skiadocs/
-#BuildRequires:	cityhash-devel
+BuildRequires:	Mesa-libGL-devel
+BuildRequires:	Mesa-libGLU-devel
+BuildRequires:	cityhash-devel >= 1.1.0
+BuildRequires:	freetype-devel
 BuildRequires:	libstdc++-devel
+BuildRequires:	python-modules
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
@@ -51,10 +55,7 @@ Statyczna biblioteka skia.
 %prep
 %setup -qn %{name}-%{subver}
 
-mv skia/{README,LICENSE} .
-
 %build
-cd skia
 %{__python} gyp_skia \
 	--format=make \
 	--depth=. \
@@ -77,7 +78,6 @@ cd skia
 rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT{%{_libdir},%{_includedir}/%{name}}
 
-cd skia
 cp -a include/* $RPM_BUILD_ROOT%{_includedir}/%{name}
 
 cd out/%{!?debug:Release}%{?debug:Debug}

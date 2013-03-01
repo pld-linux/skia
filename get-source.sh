@@ -40,7 +40,7 @@ sed -i -re '/"url"/ s,"http[^"]+","'$svnurl'",' .gclient
 
 cd ..
 
-cp -al $package $release_dir
+cp -al $package/$package $release_dir
 XZ_OPT=-e9 tar -caf $tarball --exclude-vcs $release_dir
 rm -rf $release_dir
 
