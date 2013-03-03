@@ -1,0 +1,156 @@
+--- skia-20130302/gyp/core.gyp	2013-03-03 19:56:16.214695060 +0200
++++ skia-20130302/gyp/core.gyp	2013-03-03 20:04:49.685003753 +0200
+@@ -4,8 +4,8 @@
+     {
+       'target_name': 'core',
+       'product_name': 'skia_core',
+-      'type': 'static_library',
+-      'standalone_static_library': 1,
++      'type': 'shared_library',
++      'standalone_static_library': 0,
+       'msvs_guid': 'B7760B5E-BFA8-486B-ACFD-49E3A6DE8E76',
+ 
+       'includes': [
+--- skia-20130302/gyp/opts.gyp	2013-03-03 19:57:15.794031796 +0200
++++ skia-20130302/gyp/opts.gyp	2013-03-03 20:04:09.793160557 +0200
+@@ -21,8 +21,8 @@
+     {
+       'target_name': 'opts',
+       'product_name': 'skia_opts',
+-      'type': 'static_library',
+-      'standalone_static_library': 1,
++      'type': 'shared_library',
++      'standalone_static_library': 0,
+       'include_dirs': [
+         '../include/config',
+         '../include/core',
+@@ -105,8 +105,8 @@
+     {
+       'target_name': 'opts_ssse3',
+       'product_name': 'skia_opts_ssse3',
+-      'type': 'static_library',
+-      'standalone_static_library': 1,
++      'type': 'shared_library',
++      'standalone_static_library': 0,
+       'include_dirs': [
+         '../include/config',
+         '../include/core',
+@@ -140,8 +140,8 @@
+     {
+       'target_name': 'opts_neon',
+       'product_name': 'skia_opts_neon',
+-      'type': 'static_library',
+-      'standalone_static_library': 1,
++      'type': 'shared_library',
++      'standalone_static_library': 0,
+       'include_dirs': [
+         '../include/config',
+         '../include/core',
+--- skia-20130302/gyp/utils.gyp	2013-03-03 20:04:26.900617671 +0200
++++ skia-20130302/gyp/utils.gyp	2013-03-03 20:04:26.900617671 +0200
+@@ -1,10 +1,13 @@
+ {
++  'variables': {
++    'use_system_cityhash%': 1,
++  },
+   'targets': [
+     {
+       'target_name': 'utils',
+       'product_name': 'skia_utils',
+-      'type': 'static_library',
+-      'standalone_static_library': 1,
++      'type': 'shared_library',
++      'standalone_static_library': 0,
+       'dependencies': [
+         'cityhash',
+       ],
+@@ -210,6 +213,10 @@
+         ],
+       },
+     },
++  ],
++  'conditions': [
++    ['use_system_cityhash==0', {
++    'targets': [
+     {
+       'target_name': 'cityhash',
+       'type': 'static_library',
+@@ -250,8 +257,26 @@
+           ],
+         }],
+       ],
+-    },
+-  ],
++    }],
++    }, { # use_system_cityhash==1
++      'targets': [
++        {
++          'target_name': 'cityhash',
++          'type': 'none',
++          'direct_dependent_settings': {
++            'defines': [
++              'USE_SYSTEM_CITYHASH',
++            ],
++          },
++          'link_settings': {
++            'libraries': [
++              '-lcityhash',
++            ],
++          },
++        }
++      ],
++    }],
++  ], # conditions
+ }
+ 
+ # Local Variables:
+--- skia-20130302/gyp/ports.gyp	2013-03-03 19:57:30.324703183 +0200
++++ skia-20130302/gyp/ports.gyp	2013-03-03 20:05:06.739125069 +0200
+@@ -4,8 +4,8 @@
+     {
+       'target_name': 'ports',
+       'product_name': 'skia_ports',
+-      'type': 'static_library',
+-      'standalone_static_library': 1,
++      'type': 'shared_library',
++      'standalone_static_library': 0,
+       'dependencies': [
+         'core.gyp:core',
+         'sfnt.gyp:sfnt',
+--- skia-20130302/gyp/gpu.gyp	2013-03-03 22:20:06.559592070 +0200
++++ skia-20130302/gyp/gpu.gyp	2013-03-03 22:21:40.353892658 +0200
+@@ -119,8 +119,8 @@
+     {
+       'target_name': 'skgr',
+       'product_name': 'skia_skgr',
+-      'type': 'static_library',
+-      'standalone_static_library': 1,
++      'type': 'shared_library',
++      'standalone_static_library': 0,
+       'includes': [
+         'gpu.gypi',
+       ],
+@@ -170,8 +170,8 @@
+     {
+       'target_name': 'gr',
+       'product_name': 'skia_gr',
+-      'type': 'static_library',
+-      'standalone_static_library': 1,
++      'type': 'shared_library',
++      'standalone_static_library': 0,
+       'includes': [
+         'gpu.gypi',
+       ],
+--- skia-20130302/gyp/sfnt.gyp~	2013-03-02 01:14:22.000000000 +0200
++++ skia-20130302/gyp/sfnt.gyp	2013-03-03 22:22:25.635968899 +0200
+@@ -3,8 +3,8 @@
+     {
+       'target_name': 'sfnt',
+       'product_name': 'skia_sfnt',
+-      'type': 'static_library',
+-      'standalone_static_library': 1,
++      'type': 'shared_library',
++      'standalone_static_library': 0,
+       'dependencies': [
+         'core.gyp:core',
+       ],

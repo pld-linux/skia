@@ -1,6 +1,6 @@
 #
 # Conditional build:
-%bcond_without	static_libs	# don't build static library
+%bcond_with	static_libs	# don't build static library
 %bcond_without	verbose			# verbose build (V=1)
 
 %define		subver	20130302
@@ -15,6 +15,7 @@ Source0:	%{name}-%{subver}.tar.xz
 # Source0-md5:	e2de2d4871a315cd1e252f77cd96dca2
 Source1:	get-source.sh
 Source2:	gclient.conf
+Patch0:		shared-libs.patch
 URL:		https://sites.google.com/site/skiadocs/
 BuildRequires:	Mesa-libGL-devel
 BuildRequires:	Mesa-libGLU-devel
@@ -54,6 +55,7 @@ Statyczna biblioteka skia.
 
 %prep
 %setup -qn %{name}-%{subver}
+%patch0 -p1
 
 %build
 %{__python} gyp_skia \
@@ -82,14 +84,30 @@ cp -a include/* $RPM_BUILD_ROOT%{_includedir}/%{name}
 
 cd out/%{!?debug:Release}%{?debug:Debug}
 
+install -p lib.target/lib*.so $RPM_BUILD_ROOT%{_libdir}
+
+%if %{with static_libs}
 cp -p lib*.a $RPM_BUILD_ROOT%{_libdir}
+%endif
 
 %clean
 rm -rf $RPM_BUILD_ROOT
 
+# ldconfig to update ld.so.cache
+%post	-p /sbin/ldconfig
+%postun	-p /sbin/ldconfig
+
 %files
 %defattr(644,root,root,755)
 %doc README LICENSE
+%attr(755,root,root) %{_libdir}/libskia_core.so
+%attr(755,root,root) %{_libdir}/libskia_gr.so
+%attr(755,root,root) %{_libdir}/libskia_opts.so
+%attr(755,root,root) %{_libdir}/libskia_opts_ssse3.so
+%attr(755,root,root) %{_libdir}/libskia_ports.so
+%attr(755,root,root) %{_libdir}/libskia_sfnt.so
+%attr(755,root,root) %{_libdir}/libskia_skgr.so
+%attr(755,root,root) %{_libdir}/libskia_utils.so
 
 %files devel
 %defattr(644,root,root,755)
@@ -103,6 +121,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/libskia_opts.a
 %{_libdir}/libskia_opts_ssse3.a
 %{_libdir}/libskia_ports.a
+%{_libdir}/libskia_sfnt.a
 %{_libdir}/libskia_skgr.a
 %{_libdir}/libskia_utils.a
 %endif
